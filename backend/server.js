@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// DB CONNECTION
+// ================= DB CONNECTION =================
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -16,9 +16,9 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
   if (err) {
-    console.log("DB Connection Failed:", err);
+    console.log("❌ DB Connection Failed:", err);
   } else {
-    console.log("MySQL Connected");
+    console.log("✅ MySQL Connected");
   }
 });
 
@@ -27,7 +27,6 @@ db.connect((err) => {
 app.post("/register", (req, res) => {
   const { name, email, password } = req.body;
 
-  // Check if email already exists
   db.query("SELECT * FROM users WHERE email=?", [email], (err, result) => {
     if (err) return res.send("Database Error");
 
@@ -35,16 +34,12 @@ app.post("/register", (req, res) => {
       return res.send("Email already registered");
     }
 
-    // Insert new user
     db.query(
       "INSERT INTO users (name,email,password) VALUES (?,?,?)",
       [name, email, password],
       (err) => {
-        if (err) {
-          res.send("Error while registering");
-        } else {
-          res.send("Registered Successfully");
-        }
+        if (err) res.send("Error while registering");
+        else res.send("Registered Successfully");
       }
     );
   });
@@ -138,7 +133,24 @@ app.get("/progress/:user_id", (req, res) => {
 });
 
 
+// ================= 🏆 LEADERBOARD (NEW) =================
+app.get("/leaderboard", (req, res) => {
+  db.query(
+    `SELECT users.name, MAX(quiz_attempt.score) AS score 
+     FROM quiz_attempt 
+     JOIN users ON users.user_id = quiz_attempt.user_id 
+     GROUP BY users.user_id 
+     ORDER BY score DESC 
+     LIMIT 5`,
+    (err, result) => {
+      if (err) res.send([]);
+      else res.send(result);
+    }
+  );
+});
+
+
 // ================= SERVER =================
 app.listen(3001, () => {
-  console.log("Server running on port 3001");
+  console.log("🚀 Server running on port 3001");
 });

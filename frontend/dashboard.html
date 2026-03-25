@@ -1,19 +1,176 @@
-<h2>Dashboard</h2>
-<div id="progress"></div>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
 
-<a href="quiz.html">Start Quiz</a>
-<a href="add-question.html">Admin</a>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      color: white;
+      text-align: center;
+    }
+
+    .nav {
+      margin: 15px;
+    }
+
+    .nav a, .nav button {
+      padding: 10px 15px;
+      margin: 5px;
+      border-radius: 8px;
+      border: none;
+      background: black;
+      color: white;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .container {
+      width: 85%;
+      margin: auto;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+
+    .box {
+      background: white;
+      color: black;
+      padding: 15px;
+      border-radius: 10px;
+      width: 30%;
+    }
+
+    .card {
+      background: white;
+      color: black;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+      text-align: left;
+    }
+
+    canvas {
+      background: white;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>📊 Advanced Dashboard</h2>
+
+<div class="nav">
+  <a href="quiz.html">Start Quiz</a>
+  <a href="add-question.html">Admin</a>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="box">
+      <h3 id="total">0</h3>
+      <p>Total Attempts</p>
+    </div>
+
+    <div class="box">
+      <h3 id="avg">0</h3>
+      <p>Average Score</p>
+    </div>
+
+    <div class="box">
+      <h3 id="best">0</h3>
+      <p>Best Score</p>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <canvas id="chart" height="100"></canvas>
+
+  <!-- Progress -->
+  <h3>📈 History</h3>
+  <div id="progress"></div>
+
+  <!-- Leaderboard -->
+  <h3>🏆 Leaderboard</h3>
+  <div id="leaderboard"></div>
+
+</div>
 
 <script>
 const user = JSON.parse(localStorage.getItem("user"));
 
-fetch("http://localhost:3001/progress/"+user.user_id)
+// 🔴 Logout
+function logout(){
+  localStorage.removeItem("user");
+  window.location = "login.html";
+}
+
+// 📊 FETCH PROGRESS
+fetch("http://localhost:3001/progress/" + user.user_id)
+.then(res => res.json())
+.then(data => {
+
+  let html = "";
+  let scores = [];
+  let total = data.length;
+  let sum = 0;
+  let best = 0;
+
+  data.forEach((d,i)=>{
+    scores.push(d.score);
+    sum += d.score;
+    if(d.score > best) best = d.score;
+
+    html += `
+      <div class="card">
+        Attempt ${i+1} - Score: ${d.score} (${d.topic}-${d.difficulty})
+      </div>
+    `;
+  });
+
+  document.getElementById("progress").innerHTML = html;
+
+  document.getElementById("total").innerText = total;
+  document.getElementById("best").innerText = best;
+  document.getElementById("avg").innerText =
+    total ? (sum/total).toFixed(1) : 0;
+
+  // 📈 CHART
+  new Chart(document.getElementById("chart"), {
+    type: "line",
+    data: {
+      labels: scores.map((_,i)=>"A"+(i+1)),
+      datasets: [{
+        label: "Score Progress",
+        data: scores
+      }]
+    }
+  });
+});
+
+// 🏆 LEADERBOARD
+fetch("http://localhost:3001/leaderboard")
 .then(res=>res.json())
 .then(data=>{
-let html="";
-data.forEach(d=>{
-html += `<p>Score: ${d.score} (${d.topic}-${d.difficulty})</p>`;
-});
-document.getElementById("progress").innerHTML = html;
+  let html = "";
+  data.forEach((u,i)=>{
+    html += `<div class="card">#${i+1} ${u.name} - ${u.score}</div>`;
+  });
+  document.getElementById("leaderboard").innerHTML = html;
 });
 </script>
+
+</body>
+</html>
