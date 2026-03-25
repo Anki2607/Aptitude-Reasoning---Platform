@@ -1,34 +1,140 @@
-<form id="form">
-<input placeholder="Topic">
-<input placeholder="Difficulty">
-<input placeholder="Question">
-<input placeholder="Option A">
-<input placeholder="Option B">
-<input placeholder="Option C">
-<input placeholder="Option D">
-<input placeholder="Correct (A/B/C/D)">
-<button>Add</button>
-</form>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Question</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #36d1dc, #5b86e5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .box {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      width: 380px;
+      box-shadow: 0px 5px 20px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    input, select {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #5b86e5;
+    }
+
+    button {
+      width: 95%;
+      padding: 10px;
+      margin-top: 10px;
+      background: #5b86e5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #3b6bdc;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>➕ Add Question</h2>
+
+  <form id="form">
+
+    <select required>
+      <option value="">Select Topic</option>
+      <option>Math</option>
+      <option>Reasoning</option>
+    </select>
+
+    <select required>
+      <option value="">Select Difficulty</option>
+      <option>Easy</option>
+      <option>Medium</option>
+      <option>Hard</option>
+    </select>
+
+    <input placeholder="Enter Question" required>
+    <input placeholder="Option A" required>
+    <input placeholder="Option B" required>
+    <input placeholder="Option C" required>
+    <input placeholder="Option D" required>
+
+    <select required>
+      <option value="">Correct Answer</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+    </select>
+
+    <button type="submit">Add Question</button>
+
+  </form>
+</div>
 
 <script>
-document.getElementById("form").onsubmit=async function(e){
-e.preventDefault();
+document.getElementById("form").onsubmit = async function(e){
+  e.preventDefault();
 
-await fetch("http://localhost:3001/add-question",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-topic:e.target[0].value,
-difficulty:e.target[1].value,
-question:e.target[2].value,
-optionA:e.target[3].value,
-optionB:e.target[4].value,
-optionC:e.target[5].value,
-optionD:e.target[6].value,
-correct_ans:e.target[7].value
-})
-});
+  const topic = e.target[0].value;
+  const difficulty = e.target[1].value;
+  const question = e.target[2].value;
+  const optionA = e.target[3].value;
+  const optionB = e.target[4].value;
+  const optionC = e.target[5].value;
+  const optionD = e.target[6].value;
+  const correct_ans = e.target[7].value;
 
-alert("Added");
+  // Validation
+  if(!topic || !difficulty || !correct_ans){
+    alert("Please fill all fields properly");
+    return;
+  }
+
+  await fetch("http://localhost:3001/add-question", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      topic,
+      difficulty,
+      question,
+      optionA,
+      optionB,
+      optionC,
+      optionD,
+      correct_ans
+    })
+  });
+
+  alert("Question Added Successfully");
+  e.target.reset();
 }
 </script>
+
+</body>
+</html>

@@ -2,77 +2,94 @@
 <html>
 <head>
   <title>Register</title>
+
   <style>
     body {
-      font-family: Arial;
-      text-align: center;
-      background: #f5f5f5;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #43e97b, #38f9d7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
-    form {
+    .register-box {
       background: white;
-      padding: 20px;
-      width: 300px;
-      margin: auto;
-      margin-top: 100px;
-      border-radius: 10px;
+      padding: 30px;
+      border-radius: 15px;
+      width: 350px;
+      text-align: center;
+      box-shadow: 0px 5px 20px rgba(0,0,0,0.3);
     }
 
-    input, button {
-      margin: 10px;
-      padding: 10px;
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input {
       width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #43e97b;
     }
 
     button {
-      background: blue;
-      color: white;
+      width: 95%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
       border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .submit-btn {
+      background: #43e97b;
+      color: white;
+    }
+
+    .submit-btn:hover {
+      background: #2ecc71;
+    }
+
+    .reset-btn {
+      background: #ddd;
+    }
+
+    .reset-btn:hover {
+      background: #bbb;
+    }
+
+    .link {
+      margin-top: 15px;
+      display: block;
+      color: #43e97b;
+      text-decoration: none;
+    }
+
+    .link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 
 <body>
 
-<h2>Register</h2>
+<div class="register-box">
+  <h2>📝 Register</h2>
 
-<form id="registerForm">
-  <input type="text" id="name" placeholder="Name" required>
-  <input type="email" id="email" placeholder="Email" required>
-  <input type="password" id="password" placeholder="Password (min 6)" required>
-  
-  <button type="submit">Register</button>
-  <button type="reset">Reset</button>
-</form>
+  <form id="registerForm">
+    <input type="text" id="name" placeholder="Enter Name" required>
+    <input type="email" id="email" placeholder="Enter Email" required>
+    <input type="password" id="password" placeholder="Password (min 6)" required>
 
-<script>
-document.getElementById("registerForm").onsubmit = async function(e){
-  e.preventDefault();
-
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  // ✅ Validation
-  if(password.length < 6){
-    alert("Password must be at least 6 characters");
-    return;
-  }
-
-  // Send data to backend
-  const res = await fetch("http://localhost:3001/register", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ name, email, password })
-  });
-
-  const msg = await res.text();
-  alert(msg);
-
-  // Redirect after register
-  window.location = "login.html";
-}
-</script>
-
-</body>
-</html>
+    <button type="submit" class="submit-btn">Register</button>
+    <button type="reset" class="
