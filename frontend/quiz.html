@@ -1,0 +1,74 @@
+<select id="topic">
+<option>Math</option>
+<option>Reasoning</option>
+</select>
+
+<select id="difficulty">
+<option>Easy</option>
+<option>Medium</option>
+<option>Hard</option>
+</select>
+
+<button onclick="startQuiz()">Start</button>
+
+<div id="quiz"></div>
+
+<script>
+let questions=[];
+
+// SCREEN LOCK
+document.addEventListener("visibilitychange", ()=>{
+if(document.hidden){
+alert("Cheating detected!");
+}
+});
+
+function startQuiz(){
+const topic = document.getElementById("topic").value;
+const difficulty = document.getElementById("difficulty").value;
+
+fetch(`http://localhost:3001/questions?topic=${topic}&difficulty=${difficulty}`)
+.then(res=>res.json())
+.then(data=>{
+questions=data;
+
+let html="";
+data.forEach((q,i)=>{
+html+=`
+<p>${q.question}</p>
+<input type="radio" name="q${i}" value="A">${q.optionA}<br>
+<input type="radio" name="q${i}" value="B">${q.optionB}<br>
+<input type="radio" name="q${i}" value="C">${q.optionC}<br>
+<input type="radio" name="q${i}" value="D">${q.optionD}<br>
+`;
+});
+
+html += `<button onclick="submitQuiz('${topic}','${difficulty}')">Submit</button>`;
+document.getElementById("quiz").innerHTML = html;
+});
+}
+
+function submitQuiz(topic,difficulty){
+let score=0;
+
+questions.forEach((q,i)=>{
+const ans=document.querySelector(`input[name="q${i}"]:checked`);
+if(ans && ans.value===q.correct_ans) score++;
+});
+
+const user = JSON.parse(localStorage.getItem("user"));
+
+fetch("http://localhost:3001/save-score",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+user_id:user.user_id,
+score,
+topic,
+difficulty
+})
+});
+
+alert("Score: "+score);
+}
+</script>

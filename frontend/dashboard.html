@@ -1,0 +1,19 @@
+<h2>Dashboard</h2>
+<div id="progress"></div>
+
+<a href="quiz.html">Start Quiz</a>
+<a href="add-question.html">Admin</a>
+
+<script>
+const user = JSON.parse(localStorage.getItem("user"));
+
+fetch("http://localhost:3001/progress/"+user.user_id)
+.then(res=>res.json())
+.then(data=>{
+let html="";
+data.forEach(d=>{
+html += `<p>Score: ${d.score} (${d.topic}-${d.difficulty})</p>`;
+});
+document.getElementById("progress").innerHTML = html;
+});
+</script>

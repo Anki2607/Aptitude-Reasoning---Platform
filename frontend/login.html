@@ -1,0 +1,29 @@
+<form id="loginForm">
+<input type="email" required placeholder="Email"><br>
+<input type="password" required placeholder="Password"><br>
+<button>Login</button>
+</form>
+
+<script>
+document.getElementById("loginForm").onsubmit = async function(e){
+e.preventDefault();
+
+const res = await fetch("http://localhost:3001/login", {
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body: JSON.stringify({
+email:e.target[0].value,
+password:e.target[1].value
+})
+});
+
+const data = await res.json();
+
+if(data.success){
+localStorage.setItem("user", JSON.stringify(data.user));
+window.location="dashboard.html";
+}else{
+alert("Invalid");
+}
+}
+</script>
