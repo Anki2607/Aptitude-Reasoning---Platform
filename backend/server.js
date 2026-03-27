@@ -6,11 +6,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ================= DB CONNECTION =================
+// DB CONNECTION
+/*const db = mysql.createConnection({
+  host: "localhost",
+  user: "root", 
+  password: "YOUR_NEW_PASSWORD", // Put your MySQL Root password here
+  database: "aptitude_platform"
+});*/
+
 const db = mysql.createConnection({
   host: "localhost",
-  user: "root",
-  password: "",
+  user: "root", 
+  password: "anjali02@12@2004@",
   database: "aptitude_platform"
 });
 

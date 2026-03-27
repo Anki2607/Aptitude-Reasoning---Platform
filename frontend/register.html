@@ -86,10 +86,52 @@
 <div class="register-box">
   <h2>📝 Register</h2>
 
-  <form id="registerForm">
+  <!--<form id="registerForm">
     <input type="text" id="name" placeholder="Enter Name" required>
     <input type="email" id="email" placeholder="Enter Email" required>
     <input type="password" id="password" placeholder="Password (min 6)" required>
 
     <button type="submit" class="submit-btn">Register</button>
-    <button type="reset" class="
+    <button type="reset" class="-->
+    <form id="registerForm">
+    <input type="text" id="name" placeholder="Enter Name" required>
+    <input type="email" id="email" placeholder="Enter Email" required>
+    <input type="password" id="password" placeholder="Password (min 6)" required>
+
+    <button type="submit" class="submit-btn">Register</button>
+    <button type="reset" class="reset-btn">Reset</button>
+  </form>
+
+  <a href="login.html" class="link">Already have an account? Login</a>
+</div>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // This collects the data from your input boxes
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        const response = await fetch('http://localhost:3001/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await response.text();
+        alert(data); // Shows "Registered Successfully"
+        
+        if (data === "Registered Successfully") {
+            window.location.href = "login.html"; // Redirects to login page
+        }
+    } catch (error) {
+        alert("Server is not running. Please start node server.js");
+    }
+});
+</script>
+
+</body>
+</html>
