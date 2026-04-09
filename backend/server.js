@@ -1,5 +1,5 @@
 const express = require("express");
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const cors = require("cors");
 
 const app = express();
@@ -157,7 +157,6 @@ app.get("/leaderboard", (req, res) => {
 });
 
 
-// ================= SERVER =================
-app.listen(3001, () => {
-  console.log("🚀 Server running on port 3001");
-});
+
+
+
