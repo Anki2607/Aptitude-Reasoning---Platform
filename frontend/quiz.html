@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html>
 <head>
   <title>Quiz</title>
@@ -207,6 +207,163 @@ function submitQuiz(topic,difficulty){
   document.getElementById("quiz").innerHTML = "";
 }
 
+</script>
+
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quiz</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: linear-gradient(to right, #ff9966, #ff5e62);
+      text-align: center;
+      color: white;
+    }
+    .container { width: 80%; margin: auto; margin-top: 30px; }
+    select, button { padding: 10px; margin: 10px; border-radius: 8px; border: none; }
+    button { background: black; color: white; cursor: pointer; }
+    button:hover { background: #333; }
+    .card {
+      background: white; color: black; padding: 15px; margin: 15px 0;
+      border-radius: 10px; text-align: left; box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+    }
+    .option { padding: 5px; margin: 5px 0; cursor: pointer; display: block; }
+    .timer { font-size: 20px; margin-top: 10px; color: yellow; font-weight: bold; }
+    .result { font-size: 22px; margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+
+<body>
+
+<h2>🧠 Aptitude Quiz</h2>
+
+<div class="container">
+
+<select id="topic">
+  <option value="">-- Select Topic --</option>
+  <option value="Problems of Train">Problems of Train</option>
+  <option value="Time and Distance">Time and Distance</option>
+  <option value="Height and Distance">Height and Distance</option>
+  <option value="Time and Work">Time and Work</option>
+  <option value="Logical Reasoning">Logical Reasoning</option>
+  <option value="Number Series">Number Series</option>
+</select>
+
+<select id="difficulty">
+  <option>Easy</option>
+  <option>Medium</option>
+  <option>Hard</option>
+</select>
+
+<button onclick="startQuiz()">Start Quiz</button>
+
+<div class="timer" id="timer"></div>
+<div id="quiz"></div>
+<div class="result" id="result"></div>
+
+</div>
+
+<script>
+let questions = [];
+let timeLeft = 60;
+let timerInterval;
+
+// 🚫 SCREEN LOCK (Anti-Cheating)
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && questions.length > 0) {
+    alert("⚠️ Cheating detected! Don't switch tabs.");
+  }
+});
+
+function startQuiz() {
+  document.getElementById("result").innerHTML = "";
+  const topic = document.getElementById("topic").value;
+  const difficulty = document.getElementById("difficulty").value;
+
+  if(!topic) { alert("Please select a topic!"); return; }
+
+  // encodeURIComponent use kiya gaya hai taaki "Time and Work" jaise spaces wale words handle ho sakein
+  fetch(`http://localhost:3001/questions?topic=${encodeURIComponent(topic)}&difficulty=${difficulty}`)
+  .then(res => res.json())
+  .then(data => {
+    if (data.length === 0) {
+      document.getElementById("quiz").innerHTML = "<p>No questions available for this selection.</p>";
+      document.getElementById("timer").innerHTML = "";
+      return;
+    }
+
+    questions = data;
+    let html = "";
+
+    data.forEach((q, i) => {
+      html += `
+        <div class="card">
+          <b>Q${i+1}. ${q.question}</b><br><br>
+          <label class="option"><input type="radio" name="q${i}" value="A"> ${q.optionA}</label>
+          <label class="option"><input type="radio" name="q${i}" value="B"> ${q.optionB}</label>
+          <label class="option"><input type="radio" name="q${i}" value="C"> ${q.optionC}</label>
+          <label class="option"><input type="radio" name="q${i}" value="D"> ${q.optionD}</label>
+        </div>
+      `;
+    });
+
+    html += `<button onclick="submitQuiz('${topic}','${difficulty}')">Submit Quiz</button>`;
+    document.getElementById("quiz").innerHTML = html;
+    startTimer(topic, difficulty);
+  });
+}
+
+function startTimer(topic, difficulty) {
+  timeLeft = 600; // 10 Minutes timer
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    let mins = Math.floor(timeLeft / 60);
+    let secs = timeLeft % 60;
+    document.getElementById("timer").innerHTML = `⏱️ Time Left: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      alert("Time Up!");
+      submitQuiz(topic, difficulty);
+    }
+  }, 1000);
+}
+
+function submitQuiz(topic, difficulty) {
+  clearInterval(timerInterval);
+  let score = 0;
+
+  questions.forEach((q, i) => {
+    const ans = document.querySelector(`input[name="q${i}"]:checked`);
+    if (ans && ans.value === q.correct_ans) {
+      score++;
+    }
+  });
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (user) {
+    fetch("http://localhost:3001/save-score", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: user.user_id,
+        score,
+        topic,
+        difficulty
+      })
+    });
+  }
+
+  document.getElementById("result").innerHTML = `🎉 Your Score: ${score} / ${questions.length}`;
+  document.getElementById("quiz").innerHTML = "";
+  document.getElementById("timer").innerHTML = "";
+}
 </script>
 
 </body>
