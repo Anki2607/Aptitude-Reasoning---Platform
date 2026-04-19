@@ -1,52 +1,95 @@
-const express = require("express");
-const mysql = require("mysql2");
-const cors = require("cors");
+﻿console.log('Server starting...');
+const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
+const cors = require('cors');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// DB CONNECTION
-/*const db = mysql.createConnection({
-  host: "localhost",
-  user: "root", 
-  password: "YOUR_NEW_PASSWORD", // Put your MySQL Root password here
-  database: "aptitude_platform"
-});*/
+// Serve frontend static files
+const publicPath = path.join(__dirname, '../frontend');
+app.use(express.static(publicPath));
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root", 
-  password: "anjali02@12@2004@",
-  database: "aptitude_platform"
+// Simple test route
+app.get('/hello', (req, res) => {
+  res.send('Hello from Express!');
 });
 
-db.connect((err) => {
+// Route for root path
+app.get('/', (req, res) => {
+  console.log('Serving index.html for root');
+  const filePath = path.join(__dirname, '../frontend/index.html');
+  console.log('File path:', filePath);
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.error('Error sending file:', err);
+      res.status(500).send('Error loading page');
+    }
+  });
+});
+
+// DB CONNECTION
+console.log('Connecting to SQLite...');
+const db = new sqlite3.Database('./aptitude_platform.db', (err) => {
+  console.log('DB callback called');
   if (err) {
-    console.log("❌ DB Connection Failed:", err);
+    console.log('DB Connection Failed:', err);
   } else {
-    console.log("✅ MySQL Connected");
+    console.log('SQLite Connected');
+    // Create tables if they don't exist
+    db.run(`CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT,
+      email TEXT UNIQUE,
+      password TEXT
+    )`);
+    db.run(`CREATE TABLE IF NOT EXISTS question (
+      q_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      topic TEXT,
+      difficulty TEXT,
+      question TEXT,
+      optionA TEXT,
+      optionB TEXT,
+      optionC TEXT,
+      optionD TEXT,
+      correct_ans TEXT
+    )`);
+    db.run(`CREATE TABLE IF NOT EXISTS quiz_attempt (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      score INTEGER,
+      topic TEXT,
+      difficulty TEXT,
+      attempt_date TEXT
+    )`);
   }
 });
 
 
 // ================= REGISTER =================
-app.post("/register", (req, res) => {
+app.post('/register', (req, res) => {
   const { name, email, password } = req.body;
 
-  db.query("SELECT * FROM users WHERE email=?", [email], (err, result) => {
-    if (err) return res.send("Database Error");
+  // Check if email already exists
+  db.get('SELECT * FROM users WHERE email=?', [email], (err, row) => {
+    if (err) return res.send('Database Error');
 
-    if (result.length > 0) {
-      return res.send("Email already registered");
+    if (row) {
+      return res.send('Email already registered');
     }
 
-    db.query(
-      "INSERT INTO users (name,email,password) VALUES (?,?,?)",
+    // Insert new user
+    db.run(
+      'INSERT INTO users (name,email,password) VALUES (?,?,?)',
       [name, email, password],
-      (err) => {
-        if (err) res.send("Error while registering");
-        else res.send("Registered Successfully");
+      function(err) {
+        if (err) {
+          res.send('Error while registering');
+        } else {
+          res.send('Registered Successfully');
+        }
       }
     );
   });
@@ -54,17 +97,17 @@ app.post("/register", (req, res) => {
 
 
 // ================= LOGIN =================
-app.post("/login", (req, res) => {
+app.post('/login', (req, res) => {
   const { email, password } = req.body;
 
-  db.query(
-    "SELECT * FROM users WHERE email=? AND password=?",
+  db.get(
+    'SELECT * FROM users WHERE email=? AND password=?',
     [email, password],
-    (err, result) => {
+    (err, row) => {
       if (err) return res.send({ success: false });
 
-      if (result.length > 0) {
-        res.send({ success: true, user: result[0] });
+      if (row) {
+        res.send({ success: true, user: row });
       } else {
         res.send({ success: false });
       }
@@ -74,94 +117,75 @@ app.post("/login", (req, res) => {
 
 
 // ================= ADD QUESTION =================
-app.post("/add-question", (req, res) => {
+app.post('/add-question', (req, res) => {
   const { topic, difficulty, question, optionA, optionB, optionC, optionD, correct_ans } = req.body;
 
-  db.query(
-    "INSERT INTO question (topic,difficulty,question,optionA,optionB,optionC,optionD,correct_ans) VALUES (?,?,?,?,?,?,?,?)",
+  db.run(
+    'INSERT INTO question (topic,difficulty,question,optionA,optionB,optionC,optionD,correct_ans) VALUES (?,?,?,?,?,?,?,?)',
     [topic, difficulty, question, optionA, optionB, optionC, optionD, correct_ans],
-    (err) => {
-      if (err) res.send("Error");
-      else res.send("Question Added");
+    function(err) {
+      if (err) res.send('Error');
+      else res.send('Question Added');
     }
   );
 });
 
 
 // ================= GET QUESTIONS =================
-app.get("/questions", (req, res) => {
+app.get('/questions', (req, res) => {
   const { topic, difficulty } = req.query;
 
-  db.query(
-    "SELECT * FROM question WHERE topic=? AND difficulty=?",
+  db.all(
+    'SELECT * FROM question WHERE topic=? AND difficulty=?',
     [topic, difficulty],
-    (err, result) => {
+    (err, rows) => {
       if (err) res.send([]);
-      else res.send(result);
+      else res.send(rows);
     }
   );
 });
 
 
 // ================= DELETE QUESTION =================
-app.delete("/delete/:id", (req, res) => {
-  db.query("DELETE FROM question WHERE q_id=?", [req.params.id], (err) => {
-    if (err) res.send("Error");
-    else res.send("Deleted Successfully");
+app.delete('/delete/:id', (req, res) => {
+  db.run('DELETE FROM question WHERE q_id=?', [req.params.id], function(err) {
+    if (err) res.send('Error');
+    else res.send('Deleted Successfully');
   });
 });
 
 
 // ================= SAVE SCORE =================
-app.post("/save-score", (req, res) => {
+app.post('/save-score', (req, res) => {
   const { user_id, score, topic, difficulty } = req.body;
 
-  db.query(
-    "INSERT INTO quiz_attempt (user_id,score,topic,difficulty,attempt_date) VALUES (?,?,?,?,NOW())",
+  db.run(
+    'INSERT INTO quiz_attempt (user_id,score,topic,difficulty,attempt_date) VALUES (?,?,?,?,datetime(\'now\'))',
     [user_id, score, topic, difficulty],
-    (err) => {
-      if (err) res.send("Error");
-      else res.send("Score Saved");
+    function(err) {
+      if (err) res.send('Error');
+      else res.send('Score Saved');
     }
   );
 });
 
 
 // ================= GET PROGRESS =================
-app.get("/progress/:user_id", (req, res) => {
-  db.query(
-    "SELECT * FROM quiz_attempt WHERE user_id=?",
+app.get('/progress/:user_id', (req, res) => {
+  db.all(
+    'SELECT * FROM quiz_attempt WHERE user_id=?',
     [req.params.user_id],
-    (err, result) => {
+    (err, rows) => {
       if (err) res.send([]);
-      else res.send(result);
+      else res.send(rows);
     }
   );
 });
 
 
-// ================= 🏆 LEADERBOARD (NEW) =================
-app.get("/leaderboard", (req, res) => {
-  db.query(
-    `SELECT users.name, MAX(quiz_attempt.score) AS score 
-     FROM quiz_attempt 
-     JOIN users ON users.user_id = quiz_attempt.user_id 
-     GROUP BY users.user_id 
-     ORDER BY score DESC 
-     LIMIT 5`,
-    (err, result) => {
-      if (err) res.send([]);
-      else res.send(result);
-    }
-  );
+console.log('About to start server...');
+
+// ================= SERVER =================
+app.listen(3001, () => {
+  console.log('🚀 Server running on http://localhost:3001');
 });
-
-const PORT = 3001; // Change this to 3001
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
-});
-
-
-
-
-
