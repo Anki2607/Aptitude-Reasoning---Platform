@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 
 // DB CONNECTION
 console.log('Connecting to SQLite...');
-const db = new sqlite3.Database('./aptitude_platform.db', (err) => {
+const db = new sqlite3.Database('../aptitude_platform.db', (err) => {
   console.log('DB callback called');
   if (err) {
     console.log('DB Connection Failed:', err);
