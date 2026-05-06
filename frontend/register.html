@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+
+  <style>
+    body{
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+
+    background:
+    linear-gradient(rgba(0,0,0,0.55),
+    rgba(0,0,0,0.55)),
+    url("background.jpg");
+
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+
+    min-height:100vh;
+    color:white;
+}
+
+    .register-box {
+         background:rgba(255,255,255,0.12);
+
+    backdrop-filter:blur(10px);
+
+    border-radius:20px;
+
+    box-shadow:0 4px 15px rgba(0,0,0,0.3);
+
+    color:white;
+
+    width:30%;
+
+    max-width:900px;
+
+    padding:30px;
+
+    margin:50px auto;
+}
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #43e97b;
+    }
+
+    button {
+      width: 95%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .submit-btn {
+      background: #43e97b;
+      color: white;
+    }
+
+    .submit-btn:hover {
+      background: #2ecc71;
+    }
+
+    .reset-btn {
+      background: #ddd;
+    }
+
+    .reset-btn:hover {
+      background: #bbb;
+    }
+
+    .link {
+      margin-top: 15px;
+      display: block;
+      color: #43e97b;
+      text-decoration: none;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="register-box">
+  <h2>📝 Register</h2>
+
+  <!--<form id="registerForm">
+    <input type="text" id="name" placeholder="Enter Name" required>
+    <input type="email" id="email" placeholder="Enter Email" required>
+    <input type="password" id="password" placeholder="Password (min 6)" required>
+
+    <button type="submit" class="submit-btn">Register</button>
+    <button type="reset" class="-->
+    <form id="registerForm">
+    <input type="text" id="name" placeholder="Enter Name" required>
+    <input type="email" id="email" placeholder="Enter Email" required>
+    <input type="password" id="password" placeholder="Password (min 6)" required>
+
+    <button type="submit" class="submit-btn">Register</button>
+    <button type="reset" class="reset-btn">Reset</button>
+  </form>
+
+  <a href="login.html" class="link">Already have an account? Login</a>
+</div>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // This collects the data from your input boxes
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        const response = await fetch('http://localhost:3001/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await response.text();
+        alert(data); // Shows "Registered Successfully"
+        
+        if (data === "Registered Successfully") {
+            window.location.href = "login.html"; // Redirects to login page
+        }
+    } catch (error) {
+        alert("Server is not running. Please start node server.js");
+    }
+});
+</script>
+
+</body>
+</html>

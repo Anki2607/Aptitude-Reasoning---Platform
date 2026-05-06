@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Question</title>
+
+  <style>
+    body{
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+
+    background:
+    linear-gradient(rgba(0,0,0,0.55),
+    rgba(0,0,0,0.55)),
+    url("background.jpg");
+
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+
+    min-height:100vh;
+    color:white;
+}
+
+    .box {
+       background:rgba(255,255,255,0.12);
+
+    backdrop-filter:blur(10px);
+
+    border-radius:20px;
+
+    box-shadow:0 4px 15px rgba(0,0,0,0.3);
+
+    color:white;
+
+    width:40%;
+
+    max-width:700px;
+
+    padding:30px;
+
+    margin:50px auto;
+}
+     
+  
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    input, select {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #5b86e5;
+    }
+
+    button {
+      width: 95%;
+      padding: 10px;
+      margin-top: 10px;
+      background: #5b86e5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #3b6bdc;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>➕ Add Question</h2>
+
+  <form id="form">
+
+    <!--<select required>
+      <option value="">Select Topic</option>
+      <option>Math</option>
+      <option>Reasoning</option>
+    </select> -->
+
+    <select required>
+  <option value="">Select Topic</option>
+  <option value="Problems of Train">Problems of Train</option>
+  <option value="Time and Distance">Time and Distance</option>
+  <option value="Height and Distance">Height and Distance</option>
+  <option value="Time and Work">Time and Work</option>
+  <option value="Logical Reasoning">Logical Reasoning</option>
+  <option value="Number Series">Number Series</option>
+</select>
+
+    <select required>
+      <option value="">Select Difficulty</option>
+      <option>Easy</option>
+      <option>Medium</option>
+      <option>Hard</option>
+    </select>
+
+    <input placeholder="Enter Question" required>
+    <input placeholder="Option A" required>
+    <input placeholder="Option B" required>
+    <input placeholder="Option C" required>
+    <input placeholder="Option D" required>
+
+    <select required>
+      <option value="">Correct Answer</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+    </select>
+
+    <button type="submit">Add Question</button>
+
+  </form>
+</div>
+
+<script>
+document.getElementById("form").onsubmit = async function(e){
+  e.preventDefault();
+
+  const topic = e.target[0].value;
+  const difficulty = e.target[1].value;
+  const question = e.target[2].value;
+  const optionA = e.target[3].value;
+  const optionB = e.target[4].value;
+  const optionC = e.target[5].value;
+  const optionD = e.target[6].value;
+  const correct_ans = e.target[7].value;
+
+  // Validation
+  if(!topic || !difficulty || !correct_ans){
+    alert("Please fill all fields properly");
+    return;
+  }
+
+  await fetch("http://localhost:3001/add-question", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      topic,
+      difficulty,
+      question,
+      optionA,
+      optionB,
+      optionC,
+      optionD,
+      correct_ans
+    })
+  });
+
+  alert("Question Added Successfully");
+  e.target.reset();
+}
+</script>
+
+</body>
+</html>
