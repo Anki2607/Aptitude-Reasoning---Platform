@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Questions | Aptitude Platform</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text: #f8fafc;
+            --danger: #ef4444;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        nav {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-left { display: flex; align-items: center; gap: 1rem; }
+        .back-btn { text-decoration: none; color: #94a3b8; font-size: 0.875rem; }
+        .back-btn:hover { color: white; }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .section-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 { margin-top: 0; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .full-width { grid-column: span 2; }
+
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; color: #94a3b8; font-size: 0.875rem; }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.6);
+            color: white;
+            box-sizing: border-box;
+        }
+
+        button.primary-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        /* Question List */
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .q-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+        }
+
+        .delete-btn {
+            color: var(--danger);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .options-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .correct { color: #10b981; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <script>
+        if (!localStorage.getItem("admin")) { window.location.href = "admin-login.html"; }
+    </script>
+
+    <nav>
+        <div class="nav-left">
+            <a href="admin-dashboard.html" class="back-btn">← Dashboard</a>
+            <div style="font-weight: 700;">Manage Question Bank</div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Add Question Section -->
+        <div class="section-card">
+            <h2>Add New Question</h2>
+            <form id="addQForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Topic</label>
+                        <select id="topic" required>
+                            <option value="Problems of Train">Problems of Train</option>
+                            <option value="Time and Distance">Time and Distance</option>
+                            <option value="Height and Distance">Height and Distance</option>
+                            <option value="Time and Work">Time and Work</option>
+                            <option value="Logical Reasoning">Logical Reasoning</option>
+                            <option value="Number Series">Number Series</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Difficulty</label>
+                        <select id="difficulty" required>
+                            <option value="Easy">Easy</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Hard">Hard</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Question Text</label>
+                        <textarea id="question" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group"><label>Option A</label><input type="text" id="optionA" required></div>
+                    <div class="form-group"><label>Option B</label><input type="text" id="optionB" required></div>
+                    <div class="form-group"><label>Option C</label><input type="text" id="optionC" required></div>
+                    <div class="form-group"><label>Option D</label><input type="text" id="optionD" required></div>
+                    <div class="form-group full-width">
+                        <label>Correct Answer (A/B/C/D)</label>
+                        <select id="correct_ans" required>
+                            <option value="A">Option A</option>
+                            <option value="B">Option B</option>
+                            <option value="C">Option C</option>
+                            <option value="D">Option D</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="primary-btn">Save Question</button>
+            </form>
+        </div>
+
+        <!-- View Questions Section -->
+        <div class="section-card">
+            <h2>Existing Questions</h2>
+            <div class="filters">
+                <select id="f_topic" onchange="loadQuestions()"><option value="">All Topics</option></select>
+                <select id="f_diff" onchange="loadQuestions()">
+                    <option value="">All Difficulties</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
+            <div id="qList">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        // Populate topic filter from add form
+        const topicSelect = document.getElementById("topic");
+        const fTopic = document.getElementById("f_topic");
+        Array.from(topicSelect.options).forEach(opt => {
+            const newOpt = document.createElement("option");
+            newOpt.value = opt.value;
+            newOpt.text = opt.text;
+            fTopic.add(newOpt);
+        });
+
+        document.getElementById("addQForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const body = {
+                topic: document.getElementById("topic").value,
+                difficulty: document.getElementById("difficulty").value,
+                question: document.getElementById("question").value,
+                optionA: document.getElementById("optionA").value,
+                optionB: document.getElementById("optionB").value,
+                optionC: document.getElementById("optionC").value,
+                optionD: document.getElementById("optionD").value,
+                correct_ans: document.getElementById("correct_ans").value
+            };
+
+            const res = await fetch("http://localhost:3001/add-question", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+
+            if (res.ok) {
+                alert("Question Added!");
+                e.target.reset();
+                loadQuestions();
+            }
+        };
+
+        async function loadQuestions() {
+            const topic = document.getElementById("f_topic").value;
+            const diff = document.getElementById("f_diff").value;
+            const url = `http://localhost:3001/questions?topic=${topic}&difficulty=${diff}`;
+
+            const res = await fetch(url);
+            const data = await res.json();
+            
+            const list = document.getElementById("qList");
+            if (data.length === 0) {
+                list.innerHTML = "<p style='color: #94a3b8; text-align: center;'>No questions found for this filter.</p>";
+                return;
+            }
+
+            list.innerHTML = data.map(q => `
+                <div class="q-card">
+                    <div class="q-header">
+                        <div>
+                            <span class="tag">${q.topic}</span>
+                            <span class="tag" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">${q.difficulty}</span>
+                        </div>
+                        <button class="delete-btn" onclick="deleteQ(${q.q_id})">Delete</button>
+                    </div>
+                    <div style="margin-bottom: 1rem; font-weight: 500;">${q.question}</div>
+                    <div class="options-list">
+                        <div class="${q.correct_ans === 'A' ? 'correct' : ''}">A: ${q.optionA}</div>
+                        <div class="${q.correct_ans === 'B' ? 'correct' : ''}">B: ${q.optionB}</div>
+                        <div class="${q.correct_ans === 'C' ? 'correct' : ''}">C: ${q.optionC}</div>
+                        <div class="${q.correct_ans === 'D' ? 'correct' : ''}">D: ${q.optionD}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function deleteQ(id) {
+            if (confirm("Delete this question?")) {
+                await fetch(`http://localhost:3001/delete/${id}`, { method: "DELETE" });
+                loadQuestions();
+            }
+        }
+
+        loadQuestions();
+    </script>
+</body>
+</html>

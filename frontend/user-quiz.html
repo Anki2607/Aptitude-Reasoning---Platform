@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Aptitude Quiz | Platform</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+
+            background:
+                linear-gradient(rgba(0, 0, 0, 0.55),
+                    rgba(0, 0, 0, 0.55)),
+                url("background.jpg");
+
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+
+            min-height: 100vh;
+            color: white;
+        }
+
+        .overlay {
+            background: rgba(0, 0, 0, 0.55);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 35px;
+            margin-top: 20px;
+            color: #ffd369;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            color: white;
+            width: 60%;
+            max-width: 900px;
+            padding: 40px;
+            margin: 50px auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+            width: 100%;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .option {
+            padding: 12px;
+            margin: 10px 0;
+            cursor: pointer;
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .option input {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+
+        .timer {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #ffd369;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .result {
+            text-align: center;
+            font-size: 28px;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #ffd369;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(to right, #ff9800, #ff5722);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            color: #ffd369;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="overlay">
+        <h2>🧠 Aptitude Quiz</h2>
+
+        <div class="container">
+            <div id="quizMeta" style="text-align: center; margin-bottom: 20px; opacity: 0.8;">
+                <!-- Topic and Difficulty info here -->
+            </div>
+
+            <div class="timer" id="timer">⏱️ Loading...</div>
+
+            <div id="quiz"></div>
+
+            <div id="resultArea" style="display:none; text-align:center;">
+                <div class="result" id="result"></div>
+                <a href="user-dashboard.html" class="back-btn">← Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const config = JSON.parse(localStorage.getItem("quiz_config"));
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        let questions = [];
+        let timeLeft = 600; // 10 minutes
+        let timerInterval;
+
+        if (!config || !user) {
+            window.location.href = "user-dashboard.html";
+        }
+
+        async function loadQuiz() {
+            document.getElementById("quizMeta").innerText = `${config.topic} | Level: ${config.difficulty}`;
+
+            try {
+                const res = await fetch(`http://localhost:3001/questions?topic=${encodeURIComponent(config.topic)}&difficulty=${config.difficulty}`);
+                const data = await res.json();
+
+                if (data.length === 0) {
+                    document.getElementById("quiz").innerHTML = "<p style='text-align:center;'>No questions available for this selection.</p>";
+                    document.getElementById("timer").innerHTML = "";
+                    return;
+                }
+
+                // Shuffle and pick 5
+                questions = data.sort(() => 0.5 - Math.random()).slice(0, 5);
+
+                let html = "";
+                questions.forEach((q, i) => {
+                    html += `
+                    <div class="card">
+                        <b>Q${i + 1}. ${q.question}</b><br><br>
+                        <label class="option"><input type="radio" name="q${i}" value="A"> ${q.optionA}</label>
+                        <label class="option"><input type="radio" name="q${i}" value="B"> ${q.optionB}</label>
+                        <label class="option"><input type="radio" name="q${i}" value="C"> ${q.optionC}</label>
+                        <label class="option"><input type="radio" name="q${i}" value="D"> ${q.optionD}</label>
+                    </div>
+                `;
+                });
+
+                html += `<button class="submit-btn" onclick="submitQuiz()">Submit Quiz</button>`;
+                document.getElementById("quiz").innerHTML = html;
+                startTimer();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                let mins = Math.floor(timeLeft / 60);
+                let secs = timeLeft % 60;
+                document.getElementById("timer").innerHTML = `⏱️ Time Left: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Time Up!");
+                    submitQuiz();
+                }
+            }, 1000);
+        }
+
+        async function submitQuiz() {
+            clearInterval(timerInterval);
+            let score = 0;
+
+            questions.forEach((q, i) => {
+                const ans = document.querySelector(`input[name="q${i}"]:checked`);
+                if (ans && ans.value === q.correct_ans) {
+                    score++;
+                }
+            });
+
+            // Save Score
+            try {
+                await fetch("http://localhost:3001/save-score", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        score: score,
+                        topic: config.topic,
+                        difficulty: config.difficulty
+                    })
+                });
+            } catch (err) {
+                console.error("Score saving failed", err);
+            }
+
+            document.getElementById("quiz").innerHTML = "";
+            document.getElementById("timer").innerHTML = "";
+            document.getElementById("resultArea").style.display = "block";
+            document.getElementById("result").innerHTML = `🎉 Your Score: ${score} / ${questions.length}`;
+        }
+
+        loadQuiz();
+
+        // Anti-Cheating
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden && questions.length > 0) {
+                alert("⚠️ Cheating detected! Don't switch tabs.");
+            }
+        });
+    </script>
+
+</body>
+
+</html>

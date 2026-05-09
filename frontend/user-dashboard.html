@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Dashboard | Aptitude Platform</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+
+    background:
+    linear-gradient(rgba(0,0,0,0.55),
+    rgba(0,0,0,0.55)),
+    url("background.jpg");
+
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
+
+    min-height:100vh;
+    color:white;
+}
+
+.overlay{
+    background:rgba(0,0,0,0.55);
+    min-height:100vh;
+    padding:20px;
+}
+
+nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 40px;
+    background:rgba(255,255,255,0.1);
+    backdrop-filter:blur(10px);
+    border-radius:15px;
+}
+
+.logo{
+    font-size:28px;
+    font-weight:bold;
+    color:#fff;
+}
+
+.menu a{
+    color:white;
+    text-decoration:none;
+    margin:0 15px;
+    font-size:18px;
+    transition:0.3s;
+    cursor: pointer;
+}
+
+.menu a:hover{
+    color:#ffd369;
+}
+
+.hero{
+    text-align:center;
+    margin-top:60px;
+}
+
+.hero h1{
+    font-size:55px;
+    margin-bottom:15px;
+}
+
+.hero p{
+    font-size:20px;
+    opacity:0.9;
+}
+
+.dashboard-container {
+    max-width: 1200px;
+    margin: 50px auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+.card-section {
+    background:rgba(255,255,255,0.12);
+    backdrop-filter:blur(10px);
+    border-radius:20px;
+    padding:30px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.3);
+}
+
+.card-section h2 {
+    margin-bottom: 20px;
+    color: #ffd369;
+}
+
+.quiz-form select {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    outline: none;
+}
+
+.start-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(to right,#ff9800,#ff5722);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.start-btn:hover {
+    transform: scale(1.02);
+}
+
+.attempt-list {
+    margin-top: 20px;
+}
+
+.attempt-item {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.attempt-info div:first-child {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.attempt-info div:last-child {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.score-tag {
+    background: #ffd369;
+    color: #333;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.logout-btn {
+    background: #ff4444 !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+}
+
+</style>
+</head>
+
+<body>
+
+<script>
+    if (!localStorage.getItem("user")) {
+        window.location.href = "login.html";
+    }
+</script>
+
+<div class="overlay">
+
+<nav>
+    <div class="logo">🧠 Aptitude Platform</div>
+
+    <div class="menu">
+        <a id="userLabel">Welcome, User</a>
+        <a onclick="logout()" class="logout-btn">Logout</a>
+    </div>
+</nav>
+
+<div class="hero">
+    <h1>Student Dashboard</h1>
+    <p>Select a topic and start practicing to improve your score</p>
+</div>
+
+<div class="dashboard-container">
+    <div class="card-section">
+        <h2>🚀 Start New Quiz</h2>
+        <div class="quiz-form">
+            <label style="display:block; margin-bottom:10px;">Select Topic:</label>
+            <select id="topic">
+                <option value="Problems of Train">Problems of Train</option>
+                <option value="Time and Distance">Time and Distance</option>
+                <option value="Height and Distance">Height and Distance</option>
+                <option value="Time and Work">Time and Work</option>
+                <option value="Logical Reasoning">Logical Reasoning</option>
+                <option value="Number Series">Number Series</option>
+            </select>
+
+            <label style="display:block; margin-bottom:10px;">Select Difficulty:</label>
+            <select id="difficulty">
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+            </select>
+
+            <button class="start-btn" onclick="startQuiz()">START QUIZ NOW</button>
+        </div>
+    </div>
+
+    <div class="card-section">
+        <h2>📊 Recent Activity</h2>
+        <div id="progressList" class="attempt-list">
+            <p style="text-align: center; opacity: 0.7;">Loading history...</p>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<script>
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+        document.getElementById("userLabel").innerText = `Welcome, ${user.name}`;
+    }
+
+    function logout() {
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+    }
+
+    function startQuiz() {
+        const t = document.getElementById("topic").value;
+        const d = document.getElementById("difficulty").value;
+        localStorage.setItem("quiz_config", JSON.stringify({ topic: t, difficulty: d }));
+        window.location.href = "user-quiz.html";
+    }
+
+    async function loadProgress() {
+        try {
+            const res = await fetch(`http://localhost:3001/progress/${user.id}`);
+            const data = await res.json();
+            const list = document.getElementById("progressList");
+
+            if (data.length === 0) {
+                list.innerHTML = "<p style='text-align: center; opacity: 0.7;'>No attempts yet. Start your first quiz!</p>";
+                return;
+            }
+
+            list.innerHTML = data.slice(0, 5).map(a => `
+                <div class="attempt-item">
+                    <div class="attempt-info">
+                        <div>${a.topic}</div>
+                        <div>${a.difficulty} • ${new Date(a.attempt_date).toLocaleDateString()}</div>
+                    </div>
+                    <div class="score-tag">${a.score}/5</div>
+                </div>
+            `).join('');
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    loadProgress();
+</script>
+
+</body>
+</html>

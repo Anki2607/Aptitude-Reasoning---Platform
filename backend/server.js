@@ -1,4 +1,4 @@
-﻿console.log('Server starting...');
+console.log('Server starting...');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
@@ -113,6 +113,19 @@ app.post('/login', (req, res) => {
       }
     }
   );
+});
+
+
+// ================= ADMIN LOGIN =================
+app.post('/admin-login', (req, res) => {
+  const { email, password } = req.body;
+
+  // Hardcoded Admin for now (As requested for separate panel)
+  if (email === "admin@platform.com" && password === "admin123") {
+    res.send({ success: true, admin: { name: "System Admin", email: email } });
+  } else {
+    res.send({ success: false, message: "Invalid Admin Credentials" });
+  }
 });
 
 
