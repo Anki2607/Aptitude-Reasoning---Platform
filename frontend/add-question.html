@@ -4,46 +4,25 @@
   <title>Add Question</title>
 
   <style>
-    body{
-    margin:0;
-    padding:0;
-    font-family:Arial,sans-serif;
-
-    background:
-    linear-gradient(rgba(0,0,0,0.55),
-    rgba(0,0,0,0.55)),
-    url("background.jpg");
-
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
-    background-attachment:fixed;
-
-    min-height:100vh;
-    color:white;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #36d1dc, #5b86e5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
     .box {
-       background:rgba(255,255,255,0.12);
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      width: 380px;
+      box-shadow: 0px 5px 20px rgba(0,0,0,0.3);
+      text-align: center;
+    }
 
-    backdrop-filter:blur(10px);
-
-    border-radius:20px;
-
-    box-shadow:0 4px 15px rgba(0,0,0,0.3);
-
-    color:white;
-
-    width:40%;
-
-    max-width:700px;
-
-    padding:30px;
-
-    margin:50px auto;
-}
-     
-  
     h2 {
       margin-bottom: 15px;
     }
@@ -86,21 +65,11 @@
 
   <form id="form">
 
-    <!--<select required>
+    <select required>
       <option value="">Select Topic</option>
       <option>Math</option>
       <option>Reasoning</option>
-    </select> -->
-
-    <select required>
-  <option value="">Select Topic</option>
-  <option value="Problems of Train">Problems of Train</option>
-  <option value="Time and Distance">Time and Distance</option>
-  <option value="Height and Distance">Height and Distance</option>
-  <option value="Time and Work">Time and Work</option>
-  <option value="Logical Reasoning">Logical Reasoning</option>
-  <option value="Number Series">Number Series</option>
-</select>
+    </select>
 
     <select required>
       <option value="">Select Difficulty</option>
