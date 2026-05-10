@@ -1,4 +1,4 @@
-const express = require("express");
+/*const express = require("express");
 const mysql = require("mysql");
 const cors = require("cors");
 
@@ -20,7 +20,29 @@ db.connect((err) => {
   } else {
     console.log("✅ MySQL Connected");
   }
+}); */
+const express = require('express');
+const sqlite3 = require('sqlite3').verbose(); // Use SQLite, not MySQL
+const cors = require('cors');
+const path = require('path');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Path to your database file
+const dbPath = path.resolve(__dirname, '../aptitude_platform.db');
+
+// Connect to SQLite (No password needed!)
+const db = new sqlite3.Database(dbPath, (err) => {
+    if (err) {
+        console.error('❌ SQLite Connection Failed:', err);
+    } else {
+        console.log('✅ SQLite Connected Successfully');
+    }
 });
+
+// Rest of your routes...
 
 
 // ================= REGISTER =================
