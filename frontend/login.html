@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
 
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #90050595, #764ba2);
+      background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("background.jpg") no-repeat center center fixed;
+      background-size: cover;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -44,7 +47,7 @@
     button {
       width: 95%;
       padding: 10px;
-      background: #667eeab7;
+      background: #667eea;
       color: white;
       border: none;
       border-radius: 8px;
@@ -54,7 +57,7 @@
     }
 
     button:hover {
-      background: #7c2204;
+      background: #5a67d8;
     }
 
     .link {
@@ -101,7 +104,7 @@ document.getElementById("loginForm").onsubmit = async function(e){
 
   if(data.success){
     localStorage.setItem("user", JSON.stringify(data.user));
-    window.location="dashboard.html";
+    window.location="user-dashboard.html";
   } else {
     alert("Invalid Email or Password");
   }

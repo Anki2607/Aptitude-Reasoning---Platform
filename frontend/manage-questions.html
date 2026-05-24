@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (function() {
+      const originalFetch = window.fetch;
+      window.fetch = function(url, options) {
+        if (typeof url === 'string' && url.includes('localhost:3001')) {
+          const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+          if (!isLocal) {
+            url = url.replace(/https?:\/\/localhost:3001/i, '');
+          }
+        }
+        return originalFetch(url, options);
+      };
+    })();
+  </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Questions | Aptitude Platform</title>
@@ -17,7 +31,8 @@
             margin: 0;
             padding: 0;
             font-family: 'Inter', sans-serif;
-            background: #0f172a;
+            background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("background.jpg") no-repeat center center fixed;
+            background-size: cover;
             color: var(--text);
             min-height: 100vh;
         }

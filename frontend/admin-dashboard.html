@@ -16,7 +16,8 @@
             margin: 0;
             padding: 0;
             font-family: 'Inter', sans-serif;
-            background: #0f172a;
+            background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("background.jpg") no-repeat center center fixed;
+            background-size: cover;
             color: var(--text);
             min-height: 100vh;
         }
@@ -136,6 +137,12 @@
             font-size: 0.875rem;
             color: #94a3b8;
         }
+
+        .report-table th, .report-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
     </style>
 </head>
 <body>
@@ -187,10 +194,21 @@
                 <span class="stat-label">Active Students</span>
             </div>
         </div>
+        <div class="report" style="margin-top:2rem;">
+            <h3>Performance Report</h3>
+            <table class="report-table" style="width:100%; border-collapse:collapse; margin-top:1rem; color:var(--text);">
+                <thead>
+                    <tr style="background:rgba(255,255,255,0.1);">
+                        <th>Rank</th><th>Name</th><th>Attempts</th><th>Total Score</th><th>Avg Score</th><th>Best Score</th><th>Wrong</th>
+                    </tr>
+                </thead>
+                <tbody id="reportBody"></tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        const admin = JSON.parse(localStorage.getItem("admin"));
+        let admin = JSON.parse(localStorage.getItem("admin"));
         if (admin) {
             document.getElementById("welcomeText").innerText = `Welcome, ${admin.name}`;
         }
@@ -200,16 +218,29 @@
             window.location.href = "admin-login.html";
         }
 
-        // Fetch some basic stats
-        async function fetchStats() {
+        async function loadDashboard() {
             try {
-                const res = await fetch("http://localhost:3001/questions?topic=Time and Work&difficulty=Easy");
-                const data = await res.json();
-                document.getElementById("totalQuestions").innerText = "50+"; // Placeholder
-                document.getElementById("totalUsers").innerText = "12"; // Placeholder
-            } catch (err) {}
+                const statsRes = await fetch("http://localhost:3001/questions");
+                const questions = await statsRes.json();
+                document.getElementById("totalQuestions").innerText = questions.length || "0";
+                document.getElementById("totalUsers").innerText = "--";
+
+                const reportRes = await fetch("http://localhost:3001/admin/report");
+                const report = await reportRes.json();
+                document.getElementById("totalUsers").innerText = report.report ? report.report.length : "0";
+                const tbody = document.getElementById("reportBody");
+                if (report.report) {
+                    report.report.forEach(r => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `<td>${r.rank}</td><td>${r.name}</td><td>${r.attempts}</td><td>${r.totalScore}</td><td>${r.avgScore}</td><td>${r.bestScore}</td><td>${r.wrongCount}</td>`;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
         }
-        fetchStats();
+        loadDashboard();
     </script>
 </body>
 </html>

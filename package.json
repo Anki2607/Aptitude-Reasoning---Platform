@@ -1,4 +1,10 @@
 {
+  "name": "aptitude-reasoning-platform",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "concurrently \"node backend/server.js\" \"http-server frontend -p 3000\""
+  },
   "dependencies": {
     "body-parser": "^2.2.2",
     "cors": "^2.8.6",
@@ -6,6 +12,10 @@
     "mysql": "^2.18.1",
     "mysql2": "^3.22.1",
     "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "http-server": "^14.1.1"
   },
   "bundleDependencies": [
     "sqlite3"
