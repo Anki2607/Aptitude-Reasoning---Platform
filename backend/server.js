@@ -25,6 +25,7 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose(); // Use SQLite, not MySQL
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 app.use(cors());
@@ -41,6 +42,29 @@ const db = new sqlite3.Database(dbPath, (err) => {
         console.log('✅ SQLite Connected Successfully');
     }
 });
+
+// Compatibility layer for MySQL's db.query in SQLite
+db.query = function (sql, params, callback) {
+    if (typeof params === 'function') {
+        callback = params;
+        params = [];
+    }
+
+    // Replace NOW() with sqlite equivalent datetime('now', 'localtime')
+    let formattedSql = sql.replace(/\bNOW\(\)/gi, "datetime('now', 'localtime')");
+
+    const isSelect = formattedSql.trim().toUpperCase().startsWith('SELECT');
+
+    if (isSelect) {
+        db.all(formattedSql, params, (err, rows) => {
+            callback(err, rows || []);
+        });
+    } else {
+        db.run(formattedSql, params, function (err) {
+            callback(err, this);
+        });
+    }
+};
 
 // Rest of your routes...
 
@@ -79,7 +103,10 @@ app.post("/login", (req, res) => {
       if (err) return res.send({ success: false });
 
       if (result.length > 0) {
-        res.send({ success: true, user: result[0] });
+        const userObj = result[0];
+        // Populate both id and user_id for frontend compatibility
+        userObj.user_id = userObj.id;
+        res.send({ success: true, user: userObj });
       } else {
         res.send({ success: false });
       }
@@ -107,14 +134,27 @@ app.post("/add-question", (req, res) => {
 app.get("/questions", (req, res) => {
   const { topic, difficulty } = req.query;
 
-  db.query(
-    "SELECT * FROM question WHERE topic=? AND difficulty=?",
-    [topic, difficulty],
-    (err, result) => {
-      if (err) res.send([]);
-      else res.send(result);
-    }
-  );
+  let query = "SELECT * FROM question";
+  let params = [];
+  let conditions = [];
+
+  if (topic) {
+    conditions.push("topic = ?");
+    params.push(topic);
+  }
+  if (difficulty) {
+    conditions.push("difficulty = ?");
+    params.push(difficulty);
+  }
+
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
+  }
+
+  db.query(query, params, (err, result) => {
+    if (err) res.send([]);
+    else res.send(result);
+  });
 });
 
 
@@ -155,13 +195,56 @@ app.get("/progress/:user_id", (req, res) => {
 });
 
 
-// ================= 🏆 LEADERBOARD (NEW) =================
+// ================= ADMIN REPORT =================
+app.get("/admin/report", async (req, res) => {
+  try {
+    // Total questions count
+    const totalQRes = await new Promise((resolve, reject) => {
+      db.all("SELECT COUNT(*) as cnt FROM question", [], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows[0].cnt);
+      });
+    });
+    // User performance aggregation
+    const perfQuery = `SELECT users.id as user_id, users.name,
+      COUNT(qa.id) as attempts,
+      SUM(qa.score) as totalScore,
+      AVG(qa.score) as avgScore,
+      MAX(qa.score) as bestScore
+      FROM users LEFT JOIN quiz_attempt qa ON users.id = qa.user_id
+      GROUP BY users.id ORDER BY totalScore DESC`;
+    const perfData = await new Promise((resolve, reject) => {
+      db.all(perfQuery, [], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+    const report = perfData.map((row, idx) => {
+      const best = row.bestScore || 0;
+      const wrong = totalQRes - best;
+      return {
+        rank: idx + 1,
+        user_id: row.user_id,
+        name: row.name,
+        attempts: row.attempts,
+        totalScore: row.totalScore || 0,
+        avgScore: row.avgScore ? Number(row.avgScore.toFixed(2)) : 0,
+        bestScore: best,
+        wrongCount: wrong > 0 ? wrong : 0,
+      };
+    });
+    res.json({ totalQuestions: totalQRes, report });
+  } catch (e) {
+    console.error(e);
+    res.status(500).send([]);
+  }
+});
 app.get("/leaderboard", (req, res) => {
   db.query(
     `SELECT users.name, MAX(quiz_attempt.score) AS score 
      FROM quiz_attempt 
-     JOIN users ON users.user_id = quiz_attempt.user_id 
-     GROUP BY users.user_id 
+     JOIN users ON users.id = quiz_attempt.user_id 
+     GROUP BY users.id 
      ORDER BY score DESC 
      LIMIT 5`,
     (err, result) => {
@@ -171,8 +254,19 @@ app.get("/leaderboard", (req, res) => {
   );
 });
 
+// ================= ADMIN LOGIN =================
+app.post("/admin-login", (req, res) => {
+  const { email, password } = req.body;
+  if (email === "admin@platform.com" && password === "admin123") {
+    res.send({ success: true, admin: { name: "System Admin", email } });
+  } else {
+    res.send({ success: false, message: "Invalid Credentials" });
+  }
+});
 
 // ================= SERVER =================
 app.listen(3001, () => {
   console.log("🚀 Server running on port 3001");
 });
+
+module.exports = app;

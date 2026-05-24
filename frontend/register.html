@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register</title>
 
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #43e97b, #38f9d7);
+      background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("background.jpg") no-repeat center center fixed;
+      background-size: cover;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -92,4 +95,33 @@
     <input type="password" id="password" placeholder="Password (min 6)" required>
 
     <button type="submit" class="submit-btn">Register</button>
-    <button type="reset" class="
+    <button type="reset" class="reset-btn">Reset</button>
+  </form>
+
+  <a href="login.html" class="link">Already registered? Login here</a>
+</div>
+
+<script>
+document.getElementById("registerForm").onsubmit = async function(e){
+  e.preventDefault();
+
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch("http://localhost:3001/register", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ name, email, password })
+  });
+
+  const text = await res.text();
+  alert(text);
+  if(text === "Registered Successfully") {
+    window.location = "login.html";
+  }
+}
+</script>
+
+</body>
+</html>

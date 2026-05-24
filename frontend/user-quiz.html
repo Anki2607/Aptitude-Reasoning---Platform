@@ -2,6 +2,20 @@
 <html>
 
 <head>
+  <script>
+    (function() {
+      const originalFetch = window.fetch;
+      window.fetch = function(url, options) {
+        if (typeof url === 'string' && url.includes('localhost:3001')) {
+          const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+          if (!isLocal) {
+            url = url.replace(/https?:\/\/localhost:3001/i, '');
+          }
+        }
+        return originalFetch(url, options);
+      };
+    })();
+  </script>
     <title>Aptitude Quiz | Platform</title>
     <style>
         body {
