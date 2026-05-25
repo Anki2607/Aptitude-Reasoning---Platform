@@ -31,7 +31,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("background.jpg") no-repeat center center fixed;
+            background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("../background.jpg") no-repeat center center fixed;
             background-size: cover;
             height: 100vh;
             display: flex;
@@ -156,7 +156,7 @@
             <button type="submit" id="loginBtn">Secure Login</button>
         </form>
 
-        <a href="index.html" class="back-link">← Back to Portal</a>
+        <a href="../index.html" class="back-link">← Back to Portal</a>
     </div>
 
     <script>
@@ -180,7 +180,7 @@
 
                 if (data.success) {
                     localStorage.setItem("admin", JSON.stringify(data.admin));
-                    window.location.href = "admin-dashboard.html";
+                    window.location.href = "dashboard.html";
                 } else {
                     alert(data.message || "Invalid Credentials");
                     btn.innerText = "Secure Login";

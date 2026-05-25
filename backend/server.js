@@ -30,6 +30,8 @@ const fs = require('fs');
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/admin', express.static(path.join(__dirname, '../frontend/admin')));
+app.use('/user', express.static(path.join(__dirname, '../frontend/user')));
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Path to your database file

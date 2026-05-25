@@ -9,7 +9,7 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("background.jpg") no-repeat center center fixed;
+      background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("../background.jpg") no-repeat center center fixed;
       background-size: cover;
       display: flex;
       justify-content: center;
@@ -85,6 +85,7 @@
   </form>
 
   <a href="register.html" class="link">New user? Register here</a>
+  <a href="../index.html" class="link" style="color: #666; font-size: 14px;">← Back to Home</a>
 </div>
 
 <script>
@@ -104,7 +105,7 @@ document.getElementById("loginForm").onsubmit = async function(e){
 
   if(data.success){
     localStorage.setItem("user", JSON.stringify(data.user));
-    window.location="user-dashboard.html";
+    window.location="dashboard.html";
   } else {
     alert("Invalid Email or Password");
   }

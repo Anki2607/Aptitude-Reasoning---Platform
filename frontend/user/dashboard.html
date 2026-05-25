@@ -35,7 +35,7 @@ body{
     background:
     linear-gradient(rgba(0,0,0,0.55),
     rgba(0,0,0,0.55)),
-    url("background.jpg");
+    url("../background.jpg");
 
     background-size:cover;
     background-position:center;
@@ -260,7 +260,7 @@ nav{
         const t = document.getElementById("topic").value;
         const d = document.getElementById("difficulty").value;
         localStorage.setItem("quiz_config", JSON.stringify({ topic: t, difficulty: d }));
-        window.location.href = "user-quiz.html";
+        window.location.href = "quiz.html";
     }
 
     async function loadProgress() {
