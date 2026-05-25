@@ -30,7 +30,8 @@ const fs = require('fs');
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use('/admin', express.static(path.join(__dirname, '../frontend/admin pannel')));
+app.use('/user', express.static(path.join(__dirname, '../frontend/user pannel')));
 
 // Path to your database file
 const dbPath = path.resolve(__dirname, '../aptitude_platform.db');
