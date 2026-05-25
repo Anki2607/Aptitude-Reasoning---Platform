@@ -21,7 +21,7 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("background.jpg") no-repeat center center fixed;
+      background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("../background.jpg") no-repeat center center fixed;
       background-size: cover;
       text-align: center;
     }
@@ -49,6 +49,7 @@
     .question {
       font-weight: bold;
       margin-bottom: 10px;
+      color: #333;
     }
 
     .options {
@@ -69,17 +70,38 @@
     button:hover {
       background: darkred;
     }
+
+    .back-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: black;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+
+    .back-btn:hover {
+      background: #333;
+    }
   </style>
 </head>
 
 <body>
+  <script>
+      if (!localStorage.getItem("admin")) {
+          window.location.href = "login.html";
+      }
+  </script>
 
 <h2>📋 Question List (Admin Panel)</h2>
+
+<a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
 
 <div class="container" id="data"></div>
 
 <script>
-fetch("http://localhost:3001/questions?topic=Math&difficulty=Easy")
+fetch("http://localhost:3001/questions")
 .then(res => res.json())
 .then(data => {
   let html = "";

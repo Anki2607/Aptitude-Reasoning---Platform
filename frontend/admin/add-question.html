@@ -21,7 +21,7 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("background.jpg") no-repeat center center fixed;
+      background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("../background.jpg") no-repeat center center fixed;
       background-size: cover;
       display: flex;
       justify-content: center;
@@ -40,6 +40,7 @@
 
     h2 {
       margin-bottom: 15px;
+      color: #333;
     }
 
     input, select {
@@ -70,10 +71,27 @@
     button:hover {
       background: #3b6bdc;
     }
+
+    .back-btn {
+      display: block;
+      margin-top: 15px;
+      color: #5b86e5;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .back-btn:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 
 <body>
+  <script>
+      if (!localStorage.getItem("admin")) {
+          window.location.href = "login.html";
+      }
+  </script>
 
 <div class="box">
   <h2>➕ Add Question</h2>
@@ -82,15 +100,19 @@
 
     <select required>
       <option value="">Select Topic</option>
-      <option>Math</option>
-      <option>Reasoning</option>
+      <option value="Problems of Train">Problems of Train</option>
+      <option value="Time and Distance">Time and Distance</option>
+      <option value="Height and Distance">Height and Distance</option>
+      <option value="Time and Work">Time and Work</option>
+      <option value="Logical Reasoning">Logical Reasoning</option>
+      <option value="Number Series">Number Series</option>
     </select>
 
     <select required>
       <option value="">Select Difficulty</option>
-      <option>Easy</option>
-      <option>Medium</option>
-      <option>Hard</option>
+      <option value="Easy">Easy</option>
+      <option value="Medium">Medium</option>
+      <option value="Hard">Hard</option>
     </select>
 
     <input placeholder="Enter Question" required>
@@ -110,6 +132,8 @@
     <button type="submit">Add Question</button>
 
   </form>
+
+  <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
 </div>
 
 <script>
