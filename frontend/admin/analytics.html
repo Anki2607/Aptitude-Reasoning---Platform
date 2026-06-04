@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard | Aptitude Admin</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text: #f8fafc;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("../background.jpg") no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        nav {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+        }
+
+        .welcome-header {
+            margin-bottom: 3rem;
+        }
+
+        .welcome-header h1 {
+            font-size: 2.2rem;
+            margin: 0;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 1.25rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #818cf8;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-card h2 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            color: #c084fc;
+        }
+
+        .analytics-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .analytics-table th, .analytics-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.9rem;
+        }
+
+        .analytics-table th {
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        .accuracy-pill {
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        if (!localStorage.getItem("admin")) {
+            window.location.href = "login.html";
+        }
+    </script>
+
+    <nav>
+        <div class="logo">Aptitude Admin</div>
+        <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-header">
+            <h1>📊 Analytics Overview</h1>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-value" id="totalUsers">0</span>
+                <span class="stat-label">Total Users</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="totalQuestions">0</span>
+                <span class="stat-label">Total Questions</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="totalAttempts">0</span>
+                <span class="stat-label">Quiz Attempts</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="avgScore">0</span>
+                <span class="stat-label">Avg Score (out of 5)</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="avgAccuracy">0%</span>
+                <span class="stat-label">Avg Accuracy</span>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="section-card">
+                <h2>📈 Topic-wise Performance</h2>
+                <table class="analytics-table">
+                    <thead>
+                        <tr>
+                            <th>Topic</th>
+                            <th>Attempts</th>
+                            <th>Avg Score</th>
+                            <th>Accuracy</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topicStatsBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #94a3b8;">Loading data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section-card">
+                <h2>⚡ Difficulty-wise Performance</h2>
+                <table class="analytics-table">
+                    <thead>
+                        <tr>
+                            <th>Difficulty</th>
+                            <th>Attempts</th>
+                            <th>Avg Score</th>
+                            <th>Accuracy</th>
+                        </tr>
+                    </thead>
+                    <tbody id="difficultyStatsBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #94a3b8;">Loading data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchAnalytics() {
+            try {
+                const res = await fetch("http://localhost:3001/api/analytics");
+                const data = await res.json();
+
+                // Populate main stats
+                document.getElementById("totalUsers").innerText = data.totalUsers;
+                document.getElementById("totalQuestions").innerText = data.totalQuestions;
+                document.getElementById("totalAttempts").innerText = data.totalQuizAttempts;
+                document.getElementById("avgScore").innerText = data.averageScore;
+                document.getElementById("avgAccuracy").innerText = data.averageAccuracy + "%";
+
+                // Populate topic-wise statistics
+                const topicTbody = document.getElementById("topicStatsBody");
+                if (data.topicStats.length === 0) {
+                    topicTbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8;">No attempts recorded.</td></tr>`;
+                } else {
+                    topicTbody.innerHTML = data.topicStats.map(stat => `
+                        <tr>
+                            <td style="font-weight: 500;">${stat.topic}</td>
+                            <td>${stat.attempts}</td>
+                            <td style="font-weight: 600; color: #ffd369;">${stat.avgScore}</td>
+                            <td><span class="accuracy-pill">${stat.avgAccuracy}%</span></td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Populate difficulty-wise statistics
+                const diffTbody = document.getElementById("difficultyStatsBody");
+                if (data.difficultyStats.length === 0) {
+                    diffTbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8;">No attempts recorded.</td></tr>`;
+                } else {
+                    diffTbody.innerHTML = data.difficultyStats.map(stat => `
+                        <tr>
+                            <td style="font-weight: 500;">${stat.difficulty}</td>
+                            <td>${stat.attempts}</td>
+                            <td style="font-weight: 600; color: #ffd369;">${stat.avgScore}</td>
+                            <td><span class="accuracy-pill">${stat.avgAccuracy}%</span></td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById("topicStatsBody").innerHTML = `<tr><td colspan="4" style="text-align: center; color: #ef4444;">Failed to load analytics data.</td></tr>`;
+                document.getElementById("difficultyStatsBody").innerHTML = `<tr><td colspan="4" style="text-align: center; color: #ef4444;">Failed to load analytics data.</td></tr>`;
+            }
+        }
+
+        fetchAnalytics();
+    </script>
+</body>
+</html>

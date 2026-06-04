@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
   <script>
     (function() {
@@ -14,73 +15,10 @@
       };
     })();
   </script>
-  <title>Dashboard</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("background.jpg") no-repeat center center fixed;
-      background-size: cover;
-      color: white;
-      text-align: center;
-    }
-
-    .nav {
-      margin: 15px;
-    }
-
-    .nav a, .nav button {
-      padding: 10px 15px;
-      margin: 5px;
-      border-radius: 8px;
-      border: none;
-      background: black;
-      color: white;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .container {
-      width: 85%;
-      margin: auto;
-    }
-
-    .stats {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 20px;
-    }
-
-    .box {
-      background: white;
-      color: black;
-      padding: 15px;
-      border-radius: 10px;
-      width: 30%;
-    }
-
-    .card {
-      background: white;
-      color: black;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 10px;
-      text-align: left;
-    }
-
-    canvas {
-      background: white;
-      border-radius: 10px;
-      margin-top: 20px;
-    }
-  </style>
-=======
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>User Dashboard | Aptitude Platform</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 *{
@@ -150,7 +88,7 @@ nav{
 }
 
 .hero h1{
-    font-size:55px;
+    font-size:45px;
     margin-bottom:15px;
 }
 
@@ -159,12 +97,49 @@ nav{
     opacity:0.9;
 }
 
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 40px auto 0 auto;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-value {
+    display: block;
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #ffd369;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
 .dashboard-container {
     max-width: 1200px;
-    margin: 50px auto;
+    margin: 40px auto;
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 30px;
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+    }
 }
 
 .card-section {
@@ -247,49 +222,10 @@ nav{
 }
 
 </style>
->>>>>>> c0388a4a141f677a05b605a768a50650de8d3b17
 </head>
 
 <body>
-<h2>📊 Advanced Dashboard</h2>
 
-<div class="nav">
-  <a href="quiz.html">Start Quiz</a>
-  <a href="add-question.html">Admin</a>
-  <button onclick="logout()">Logout</button>
-</div>
-
-<div class="container">
-
-  <!-- Stats -->
-  <div class="stats">
-    <div class="box">
-      <h3 id="total">0</h3>
-      <p>Total Attempts</p>
-    </div>
-
-    <div class="box">
-      <h3 id="avg">0</h3>
-      <p>Average Score</p>
-    </div>
-
-    <div class="box">
-      <h3 id="best">0</h3>
-      <p>Best Score</p>
-    </div>
-  </div>
-
-  <!-- Chart -->
-  <canvas id="chart" height="100"></canvas>
-
-  <!-- Progress -->
-  <h3>📈 History</h3>
-  <div id="progress"></div>
-
-  <!-- Leaderboard -->
-  <h3>🏆 Leaderboard</h3>
-  <div id="leaderboard"></div>
-=======
 <script>
     if (!localStorage.getItem("user")) {
         window.location.href = "login.html";
@@ -308,11 +244,61 @@ nav{
 </nav>
 
 <div class="hero">
-    <h1>Student Dashboard</h1>
-    <p>Select a topic and start practicing to improve your score</p>
+    <h1 id="welcomeTitle">Student Dashboard</h1>
+    <p id="welcomeMsg">Loading your progress dashboard...</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <span class="stat-value" id="statAttempts">0</span>
+        <span class="stat-label">Total Quizzes Attempted</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value" id="statAvgScore">0</span>
+        <span class="stat-label">Average Score</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value" id="statAccuracy">0%</span>
+        <span class="stat-label">Accuracy Percentage</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value" id="statRank">--</span>
+        <span class="stat-label">Current Rank</span>
+    </div>
 </div>
 
 <div class="dashboard-container">
+    <div class="card-section">
+        <h2>📈 Progress Trend</h2>
+        <div style="position: relative; height:250px; width:100%;">
+            <canvas id="progressChart"></canvas>
+        </div>
+    </div>
+
+    <div>
+        <!-- Right Column -->
+        <div class="card-section" style="margin-bottom: 30px;">
+            <h2>🎯 Topic Performance</h2>
+            <div style="margin-bottom: 20px;">
+                <div style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 5px;">Strongest Area:</div>
+                <div id="strongTopic" style="font-size: 1.15rem; font-weight: bold; color: #10b981;">Analyzing attempts...</div>
+            </div>
+            <div>
+                <div style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 5px;">Needs Improvement:</div>
+                <div id="weakTopic" style="font-size: 1.15rem; font-weight: bold; color: #ff6b6b;">Analyzing attempts...</div>
+            </div>
+        </div>
+
+        <div class="card-section">
+            <h2>📊 Recent Activity</h2>
+            <div id="progressList" class="attempt-list">
+                <p style="text-align: center; opacity: 0.7;">Loading history...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="quiz-container" style="max-width: 1200px; margin: 0 auto 40px auto;">
     <div class="card-section">
         <h2>🚀 Start New Quiz</h2>
         <div class="quiz-form">
@@ -336,88 +322,15 @@ nav{
             <button class="start-btn" onclick="startQuiz()">START QUIZ NOW</button>
         </div>
     </div>
-
-    <div class="card-section">
-        <h2>📊 Recent Activity</h2>
-        <div id="progressList" class="attempt-list">
-            <p style="text-align: center; opacity: 0.7;">Loading history...</p>
-        </div>
-    </div>
 </div>
->>>>>>> c0388a4a141f677a05b605a768a50650de8d3b17
 
 </div>
 
 <script>
-const user = JSON.parse(localStorage.getItem("user"));
-
-// 🔴 Logout
-function logout(){
-  localStorage.removeItem("user");
-  window.location = "login.html";
-}
-
-// 📊 FETCH PROGRESS
-fetch("http://localhost:3001/progress/" + user.user_id)
-.then(res => res.json())
-.then(data => {
-
-  let html = "";
-  let scores = [];
-  let total = data.length;
-  let sum = 0;
-  let best = 0;
-
-  data.forEach((d,i)=>{
-    scores.push(d.score);
-    sum += d.score;
-    if(d.score > best) best = d.score;
-
-    html += `
-      <div class="card">
-        Attempt ${i+1} - Score: ${d.score} (${d.topic}-${d.difficulty})
-      </div>
-    `;
-  });
-
-  document.getElementById("progress").innerHTML = html;
-
-  document.getElementById("total").innerText = total;
-  document.getElementById("best").innerText = best;
-  document.getElementById("avg").innerText =
-    total ? (sum/total).toFixed(1) : 0;
-
-  // 📈 CHART
-  new Chart(document.getElementById("chart"), {
-    type: "line",
-    data: {
-      labels: scores.map((_,i)=>"A"+(i+1)),
-      datasets: [{
-        label: "Score Progress",
-        data: scores
-      }]
-    }
-  });
-});
-
-// 🏆 LEADERBOARD
-fetch("http://localhost:3001/leaderboard")
-.then(res=>res.json())
-.then(data=>{
-  let html = "";
-  data.forEach((u,i)=>{
-    html += `<div class="card">#${i+1} ${u.name} - ${u.score}</div>`;
-  });
-  document.getElementById("leaderboard").innerHTML = html;
-});
-</script>
-
-</body>
-</html>
-=======
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
         document.getElementById("userLabel").innerText = `Welcome, ${user.name}`;
+        document.getElementById("welcomeTitle").innerText = `Welcome, ${user.name}!`;
     }
 
     function logout() {
@@ -434,24 +347,155 @@ fetch("http://localhost:3001/leaderboard")
 
     async function loadProgress() {
         try {
-            const res = await fetch(`http://localhost:3001/progress/${user.id}`);
+            const res = await fetch(`http://localhost:3001/progress/${user.id || user.user_id}`);
             const data = await res.json();
-            const list = document.getElementById("progressList");
-
-            if (data.length === 0) {
-                list.innerHTML = "<p style='text-align: center; opacity: 0.7;'>No attempts yet. Start your first quiz!</p>";
-                return;
+            
+            // Fetch Rank from leaderboard
+            try {
+                const leaderboardRes = await fetch("http://localhost:3001/api/leaderboard");
+                const leaderboard = await leaderboardRes.json();
+                const rankIndex = leaderboard.findIndex(u => u.user_id === (user.id || user.user_id));
+                const rank = rankIndex !== -1 ? rankIndex + 1 : leaderboard.length + 1;
+                document.getElementById("statRank").innerText = `#${rank}`;
+            } catch (rankErr) {
+                console.error("Failed to load rank", rankErr);
+                document.getElementById("statRank").innerText = "--";
             }
 
-            list.innerHTML = data.slice(0, 5).map(a => `
-                <div class="attempt-item">
-                    <div class="attempt-info">
-                        <div>${a.topic}</div>
-                        <div>${a.difficulty} • ${new Date(a.attempt_date).toLocaleDateString()}</div>
+            // Populate Summary stats
+            const totalAttempts = data.length;
+            document.getElementById("statAttempts").innerText = totalAttempts;
+
+            let sum = 0;
+            data.forEach(a => sum += a.score);
+
+            const avgScore = totalAttempts > 0 ? (sum / totalAttempts).toFixed(2) : "0.00";
+            document.getElementById("statAvgScore").innerText = avgScore;
+
+            const accuracy = totalAttempts > 0 ? ((sum / (totalAttempts * 5)) * 100).toFixed(1) : "0.0";
+            document.getElementById("statAccuracy").innerText = accuracy + "%";
+
+            // Welcome Motivational Message
+            let message = "Welcome back! Ready to test your reasoning skills today?";
+            if (totalAttempts > 0) {
+                const accVal = parseFloat(accuracy);
+                if (accVal >= 80) {
+                    message = "🔥 Excellent work! Your accuracy is outstanding. Keep dominating the quiz bank!";
+                } else if (accVal >= 50) {
+                    message = "✨ Good job! You are doing great. Consistency is key to mastery!";
+                } else {
+                    message = "💪 Keep learning! Every mistake is a step closer to success. Try another quiz below!";
+                }
+            } else {
+                message = "🚀 Welcome to the platform! Choose a topic below to start your first quiz.";
+            }
+            document.getElementById("welcomeMsg").innerText = message;
+
+            // Topic Performance Calculation
+            const topicScores = {};
+            data.forEach(a => {
+                if (!topicScores[a.topic]) {
+                    topicScores[a.topic] = { total: 0, count: 0 };
+                }
+                topicScores[a.topic].total += a.score;
+                topicScores[a.topic].count += 1;
+            });
+
+            let bestTopic = "None";
+            let worstTopic = "None";
+            let bestAvg = -1;
+            let worstAvg = 999;
+
+            for (const topic in topicScores) {
+                const avg = topicScores[topic].total / topicScores[topic].count;
+                if (avg > bestAvg) {
+                    bestAvg = avg;
+                    bestTopic = topic;
+                }
+                if (avg < worstAvg) {
+                    worstAvg = avg;
+                    worstTopic = topic;
+                }
+            }
+
+            if (Object.keys(topicScores).length > 0) {
+                document.getElementById("strongTopic").innerText = `${bestTopic} (${(bestAvg * 20).toFixed(0)}% Accuracy)`;
+                document.getElementById("weakTopic").innerText = `${worstTopic} (${(worstAvg * 20).toFixed(0)}% Accuracy)`;
+            } else {
+                document.getElementById("strongTopic").innerText = "No attempts yet";
+                document.getElementById("weakTopic").innerText = "No attempts yet";
+            }
+
+            // Recent Activity List
+            const list = document.getElementById("progressList");
+            if (totalAttempts === 0) {
+                list.innerHTML = "<p style='text-align: center; opacity: 0.7;'>No attempts yet. Start your first quiz!</p>";
+            } else {
+                list.innerHTML = data.slice(0, 5).map(a => `
+                    <div class="attempt-item">
+                        <div class="attempt-info">
+                            <div>${a.topic}</div>
+                            <div>${a.difficulty} • ${new Date(a.attempt_date).toLocaleDateString()}</div>
+                        </div>
+                        <div class="score-tag">${a.score}/5</div>
                     </div>
-                    <div class="score-tag">${a.score}/5</div>
-                </div>
-            `).join('');
+                `).join('');
+            }
+
+            // Progress Chart
+            if (totalAttempts > 0) {
+                const chartLabels = data.map((_, i) => `Q${i + 1}`);
+                const chartScores = data.map(a => a.score);
+
+                new Chart(document.getElementById("progressChart"), {
+                    type: 'line',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [{
+                            label: 'Quiz Score',
+                            data: chartScores,
+                            borderColor: '#ffd369',
+                            backgroundColor: 'rgba(255, 211, 105, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                min: 0,
+                                max: 5,
+                                ticks: {
+                                    stepSize: 1,
+                                    color: 'rgba(255, 255, 255, 0.7)'
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: 'rgba(255, 255, 255, 0.7)'
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                document.getElementById("progressChart").outerHTML = "<p style='text-align: center; padding-top: 100px; opacity: 0.7;'>No quiz attempts yet to plot trend.</p>";
+            }
+
         } catch (err) {
             console.error(err);
         }
@@ -462,4 +506,3 @@ fetch("http://localhost:3001/leaderboard")
 
 </body>
 </html>
->>>>>>> c0388a4a141f677a05b605a768a50650de8d3b17

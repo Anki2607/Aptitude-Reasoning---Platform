@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Leaderboard | Aptitude Admin</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text: #f8fafc;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url("../background.jpg") no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        nav {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+        }
+
+        .welcome-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome-header h1 {
+            font-size: 2.2rem;
+            margin: 0;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.6);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .search-bar:focus {
+            border-color: var(--primary);
+        }
+
+        .leaderboard-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .leaderboard-table th {
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        .leaderboard-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .rank-1 { background: gold; color: #1e293b; }
+        .rank-2 { background: silver; color: #1e293b; }
+        .rank-3 { background: #cd7f32; color: #1e293b; }
+        .rank-other { background: rgba(255, 255, 255, 0.1); color: var(--text); }
+
+        .accuracy-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        if (!localStorage.getItem("admin")) {
+            window.location.href = "login.html";
+        }
+    </script>
+
+    <nav>
+        <div class="logo">Aptitude Admin</div>
+        <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-header">
+            <h1>🏆 Global Leaderboard</h1>
+        </div>
+
+        <input type="text" id="search" class="search-bar" placeholder="Search students by name..." oninput="filterLeaderboard()">
+
+        <div class="leaderboard-card">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Student Name</th>
+                        <th>Quizzes Attempted</th>
+                        <th>Total Score</th>
+                        <th>Avg Accuracy</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #94a3b8;">Loading rankings...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let leaderboardData = [];
+
+        async function fetchLeaderboard() {
+            try {
+                const res = await fetch("http://localhost:3001/api/leaderboard");
+                leaderboardData = await res.json();
+                renderLeaderboard(leaderboardData);
+            } catch (err) {
+                console.error(err);
+                document.getElementById("leaderboardBody").innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #ef4444;">Failed to load leaderboard data.</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function renderLeaderboard(data) {
+            const tbody = document.getElementById("leaderboardBody");
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #94a3b8;">No registered students found.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = data.map((user, idx) => {
+                const rank = idx + 1;
+                let rankClass = "rank-other";
+                if (rank === 1) rankClass = "rank-1";
+                else if (rank === 2) rankClass = "rank-2";
+                else if (rank === 3) rankClass = "rank-3";
+
+                return `
+                    <tr>
+                        <td><span class="rank-badge ${rankClass}">${rank}</span></td>
+                        <td style="font-weight: 500;">${user.name}</td>
+                        <td>${user.attempts}</td>
+                        <td style="font-weight: bold; color: #818cf8;">${user.total_score}</td>
+                        <td><span class="accuracy-badge">${user.accuracy}%</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterLeaderboard() {
+            const query = document.getElementById("search").value.toLowerCase();
+            const filtered = leaderboardData.filter(user => user.name.toLowerCase().includes(query));
+            renderLeaderboard(filtered);
+        }
+
+        fetchLeaderboard();
+    </script>
+</body>
+</html>

@@ -257,6 +257,106 @@ app.get("/leaderboard", (req, res) => {
   );
 });
 
+// ================= API LEADERBOARD =================
+app.get("/api/leaderboard", (req, res) => {
+  const query = `
+    SELECT 
+      u.id as user_id, 
+      u.name, 
+      COUNT(qa.id) as attempts,
+      COALESCE(SUM(qa.score), 0) as total_score,
+      CASE WHEN COUNT(qa.id) > 0 
+        THEN ROUND((SUM(qa.score) * 100.0) / (COUNT(qa.id) * 5.0), 1) 
+        ELSE 0.0 
+      END as accuracy
+    FROM users u
+    LEFT JOIN quiz_attempt qa ON u.id = qa.user_id
+    GROUP BY u.id
+    ORDER BY total_score DESC, accuracy DESC
+  `;
+  db.all(query, [], (err, rows) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json([]);
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+// ================= API ANALYTICS =================
+app.get("/api/analytics", async (req, res) => {
+  try {
+    const totalUsers = await new Promise((resolve, reject) => {
+      db.get("SELECT COUNT(*) as cnt FROM users", [], (err, row) => {
+        if (err) reject(err);
+        else resolve(row.cnt || 0);
+      });
+    });
+
+    const totalQuestions = await new Promise((resolve, reject) => {
+      db.get("SELECT COUNT(*) as cnt FROM question", [], (err, row) => {
+        if (err) reject(err);
+        else resolve(row.cnt || 0);
+      });
+    });
+
+    const attemptStats = await new Promise((resolve, reject) => {
+      db.get("SELECT COUNT(*) as cnt, AVG(score) as avgScore FROM quiz_attempt", [], (err, row) => {
+        if (err) reject(err);
+        else resolve({
+          totalAttempts: row.cnt || 0,
+          avgScore: row.avgScore ? Number(row.avgScore.toFixed(2)) : 0,
+          avgAccuracy: row.avgScore ? Number((row.avgScore * 20.0).toFixed(2)) : 0
+        });
+      });
+    });
+
+    const topicStats = await new Promise((resolve, reject) => {
+      const q = `
+        SELECT topic, 
+               COUNT(*) as attempts, 
+               ROUND(AVG(score), 2) as avgScore, 
+               ROUND(AVG(score) * 20.0, 2) as avgAccuracy
+        FROM quiz_attempt 
+        GROUP BY topic
+      `;
+      db.all(q, [], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows || []);
+      });
+    });
+
+    const difficultyStats = await new Promise((resolve, reject) => {
+      const q = `
+        SELECT difficulty, 
+               COUNT(*) as attempts, 
+               ROUND(AVG(score), 2) as avgScore, 
+               ROUND(AVG(score) * 20.0, 2) as avgAccuracy
+        FROM quiz_attempt 
+        GROUP BY difficulty
+      `;
+      db.all(q, [], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows || []);
+      });
+    });
+
+    res.json({
+      totalUsers,
+      totalQuestions,
+      totalQuizAttempts: attemptStats.totalAttempts,
+      averageScore: attemptStats.avgScore,
+      averageAccuracy: attemptStats.avgAccuracy,
+      topicStats,
+      difficultyStats
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch analytics" });
+  }
+});
+
 // ================= ADMIN LOGIN =================
 app.post("/admin-login", (req, res) => {
   const { email, password } = req.body;
