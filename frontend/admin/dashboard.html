@@ -220,12 +220,12 @@
 
         async function loadDashboard() {
             try {
-                const statsRes = await fetch("http://localhost:3001/questions");
+                const statsRes = await fetch("https://aptitude-reasoning-platform.onrender.com/questions");
                 const questions = await statsRes.json();
                 document.getElementById("totalQuestions").innerText = questions.length || "0";
                 document.getElementById("totalUsers").innerText = "--";
 
-                const reportRes = await fetch("http://localhost:3001/admin/report");
+                const reportRes = await fetch("https://aptitude-reasoning-platform.onrender.com/admin/report");
                 const report = await reportRes.json();
                 document.getElementById("totalUsers").innerText = report.report ? report.report.length : "0";
                 const tbody = document.getElementById("reportBody");

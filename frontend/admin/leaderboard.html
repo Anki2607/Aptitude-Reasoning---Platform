@@ -198,7 +198,7 @@
 
         async function fetchLeaderboard() {
             try {
-                const res = await fetch("http://localhost:3001/api/leaderboard");
+                const res = await fetch("https://aptitude-reasoning-platform.onrender.com/api/leaderboard");
                 leaderboardData = await res.json();
                 renderLeaderboard(leaderboardData);
             } catch (err) {

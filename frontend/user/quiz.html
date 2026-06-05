@@ -174,7 +174,7 @@
             document.getElementById("quizMeta").innerText = `${config.topic} | Level: ${config.difficulty}`;
 
             try {
-                const res = await fetch(`http://localhost:3001/questions?topic=${encodeURIComponent(config.topic)}&difficulty=${config.difficulty}`);
+                const res = await fetch(`https://aptitude-reasoning-platform.onrender.com/questions?topic=${encodeURIComponent(config.topic)}&difficulty=${config.difficulty}`);
                 const data = await res.json();
 
                 if (data.length === 0) {
@@ -242,7 +242,7 @@
 
             // Save Score
             try {
-                await fetch("http://localhost:3001/save-score", {
+                await fetch("https://aptitude-reasoning-platform.onrender.com/save-score", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({

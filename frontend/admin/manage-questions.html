@@ -250,7 +250,7 @@
                 correct_ans: document.getElementById("correct_ans").value
             };
 
-            const res = await fetch("http://localhost:3001/add-question", {
+            const res = await fetch("https://aptitude-reasoning-platform.onrender.com/add-question", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body)
@@ -266,7 +266,7 @@
         async function loadQuestions() {
             const topic = document.getElementById("f_topic").value;
             const diff = document.getElementById("f_diff").value;
-            const url = `http://localhost:3001/questions?topic=${encodeURIComponent(topic)}&difficulty=${diff}`;
+            const url = `https://aptitude-reasoning-platform.onrender.com/questions?topic=${encodeURIComponent(topic)}&difficulty=${diff}`;
 
             const res = await fetch(url);
             const data = await res.json();
@@ -299,7 +299,7 @@
 
         async function deleteQ(id) {
             if (confirm("Delete this question?")) {
-                await fetch(`http://localhost:3001/delete/${id}`, { method: "DELETE" });
+                await fetch(`https://aptitude-reasoning-platform.onrender.com/delete/${id}`, { method: "DELETE" });
                 loadQuestions();
             }
         }

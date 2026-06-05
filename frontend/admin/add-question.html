@@ -155,7 +155,7 @@ document.getElementById("form").onsubmit = async function(e){
     return;
   }
 
-  await fetch("http://localhost:3001/add-question", {
+  await fetch("https://aptitude-reasoning-platform.onrender.com/add-question", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({

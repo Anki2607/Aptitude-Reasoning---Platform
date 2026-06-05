@@ -92,7 +92,7 @@
 document.getElementById("loginForm").onsubmit = async function(e){
   e.preventDefault();
 
-  const res = await fetch("http://localhost:3001/login", {
+  const res = await fetch("https://aptitude-reasoning-platform.onrender.com/login", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({

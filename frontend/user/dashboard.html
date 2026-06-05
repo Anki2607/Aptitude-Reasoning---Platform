@@ -347,12 +347,12 @@ nav{
 
     async function loadProgress() {
         try {
-            const res = await fetch(`http://localhost:3001/progress/${user.id || user.user_id}`);
+            const res = await fetch(`https://aptitude-reasoning-platform.onrender.com/progress/${user.id || user.user_id}`);
             const data = await res.json();
             
             // Fetch Rank from leaderboard
             try {
-                const leaderboardRes = await fetch("http://localhost:3001/api/leaderboard");
+                const leaderboardRes = await fetch("https://aptitude-reasoning-platform.onrender.com/api/leaderboard");
                 const leaderboard = await leaderboardRes.json();
                 const rankIndex = leaderboard.findIndex(u => u.user_id === (user.id || user.user_id));
                 const rank = rankIndex !== -1 ? rankIndex + 1 : leaderboard.length + 1;

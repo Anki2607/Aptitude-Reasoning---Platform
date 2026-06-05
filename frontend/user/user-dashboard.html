@@ -265,7 +265,7 @@ nav{
 
     async function loadProgress() {
         try {
-            const res = await fetch(`http://localhost:3001/progress/${user.id}`);
+            const res = await fetch(`https://aptitude-reasoning-platform.onrender.com/progress/${user.id}`);
             const data = await res.json();
             const list = document.getElementById("progressList");
 

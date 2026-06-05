@@ -101,7 +101,7 @@
 <div class="container" id="data"></div>
 
 <script>
-fetch("http://localhost:3001/questions")
+fetch("https://aptitude-reasoning-platform.onrender.com/questions")
 .then(res => res.json())
 .then(data => {
   let html = "";
@@ -129,7 +129,7 @@ fetch("http://localhost:3001/questions")
 
 function del(id){
   if(confirm("Are you sure you want to delete this question?")){
-    fetch("http://localhost:3001/delete/" + id, { method: "DELETE" })
+    fetch("https://aptitude-reasoning-platform.onrender.com/delete/" + id, { method: "DELETE" })
     .then(() => location.reload());
   }
 }
